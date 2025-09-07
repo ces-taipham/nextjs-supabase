@@ -308,13 +308,45 @@ export interface AuditLog {
 export interface EmployeeWithDetails extends Employee {
   personal_info?: PersonalInfo;
   contact_info?: ContactInfo;
-  employment_info?: EmploymentInfo;
-  financial_info?: FinancialInfo;
+    employment_info?: (EmploymentInfo & {
+    departments?: Department;
+    manager?: Employee;
+  })[];
+  financial_info?: FinancialInfo[];
   department?: Department;
   manager?: Employee;
   contracts?: Contract[];
   skills?: (EmployeeSkill & { skill: Skill })[];
   emergency_contacts?: EmployeeContact[];
+}
+
+// Simplified version for list views
+export interface EmployeeListItem extends Employee {
+  employment_info?: {
+    id: number;
+    position_english?: string;
+    position_vietnamese?: string;
+    onboarding_date?: string;
+    departments?: {
+      id: number;
+      name: string;
+      code: string;
+    };
+  }[];
+  contact_info?: {
+    company_email?: string;
+    personal_email?: string;
+    mobile_phone?: string;
+  }[];
+}
+
+// Updated query result types
+export interface PaginatedResponse<T> {
+  data: T[];
+  count: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 // Leave request with related information
@@ -335,11 +367,22 @@ export interface DepartmentWithHierarchy extends Department {
 
 // API RESPONSE TYPES
 
+// Update the ApiResponse interface to be more specific
 export interface ApiResponse<T> {
-  metadata: any;
+  success: boolean;
   data: T;
-  error?: string;
-  message?: string;
+  error?: {
+    code: string;
+    message: string;
+  };
+  metadata?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      total: number;
+      totalPages: number;
+    };
+  };
 }
 
 export interface PaginatedResponse<T> {

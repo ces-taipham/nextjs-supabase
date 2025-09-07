@@ -15,12 +15,13 @@ import { EMPLOYMENT_STATUS_OPTIONS, MARITAL_STATUS_OPTIONS } from '@/lib/databas
 import type { CreateEmployeeRequest, UpdateEmployeeRequest, Employee } from '@/lib/supabase-types';
 import { useRouter } from 'next/navigation';
 
+// Updated schema to handle optional marital status properly
 const employeeFormSchema = z.object({
   full_name_english: z.string().min(2, 'English name must be at least 2 characters').max(150),
   full_name_vietnamese: z.string().min(2, 'Vietnamese name must be at least 2 characters').max(150),
   display_name: z.string().max(100).optional(),
   employment_status: z.enum(['Active', 'Terminated', 'Pre-onboarding', 'Onboarding']),
-  marital_status: z.enum(['Single', 'Married', 'Divorced', 'Widowed']).optional(),
+  marital_status: z.enum(['Single', 'Married', 'Divorced', 'Widowed', 'not_specified']).optional(),
 });
 
 type EmployeeFormData = z.infer<typeof employeeFormSchema>;
@@ -42,19 +43,25 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
       full_name_vietnamese: employee?.full_name_vietnamese || '',
       display_name: employee?.display_name || '',
       employment_status: employee?.employment_status || 'Active',
-      marital_status: employee?.marital_status || undefined,
+      marital_status: employee?.marital_status || 'not_specified',
     },
   });
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
+      // Transform data before submission
+      const submitData = {
+        ...data,
+        marital_status: data.marital_status === 'not_specified' ? undefined : data.marital_status,
+      };
+
       if (mode === 'create') {
-        const result = await createEmployee.mutateAsync(data as CreateEmployeeRequest);
+        const result = await createEmployee.mutateAsync(submitData as CreateEmployeeRequest);
         router.push(`/employees/${result.employee_id}`);
       } else if (employee) {
         await updateEmployee.mutateAsync({
           employeeId: employee.employee_id,
-          updates: data as UpdateEmployeeRequest,
+          updates: submitData as UpdateEmployeeRequest,
         });
         router.push(`/employees/${employee.employee_id}`);
       }
@@ -93,7 +100,7 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
                   name="full_name_english"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name (English)</FormLabel>
+                      <FormLabel>Full Name (English) *</FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} />
                       </FormControl>
@@ -107,7 +114,7 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
                   name="full_name_vietnamese"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name (Vietnamese)</FormLabel>
+                      <FormLabel>Full Name (Vietnamese) *</FormLabel>
                       <FormControl>
                         <Input placeholder="Nguyễn Văn A" {...field} />
                       </FormControl>
@@ -135,11 +142,11 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
                   name="employment_status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employment Status</FormLabel>
+                      <FormLabel>Employment Status *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder="Select employment status" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -160,7 +167,7 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
                   name="marital_status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Marital Status (Optional)</FormLabel>
+                      <FormLabel>Marital Status</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -168,7 +175,7 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Not specified</SelectItem>
+                          <SelectItem value="not_specified">Not specified</SelectItem>
                           {MARITAL_STATUS_OPTIONS.map(option => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
@@ -183,9 +190,17 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : mode === 'create' ? 'Create Employee' : 'Update Employee'}
+                <Button type="submit" disabled={isLoading} className="flex-1">
+                  {isLoading ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                      {mode === 'create' ? 'Creating...' : 'Updating...'}
+                    </>
+                  ) : (
+                    mode === 'create' ? 'Create Employee' : 'Update Employee'
+                  )}
                 </Button>
+                
                 <Button 
                   type="button" 
                   variant="outline" 
@@ -197,6 +212,24 @@ export function EmployeeForm({ employee, mode }: EmployeeFormProps) {
               </div>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+
+      {/* Additional Information Note */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-3">
+            <div className="h-5 w-5 text-blue-500 mt-0.5">
+              ℹ️
+            </div>
+            <div>
+              <h4 className="font-medium text-blue-900">Additional Information</h4>
+              <p className="text-sm text-blue-700 mt-1">
+                After creating the employee, you can add more detailed information such as contact details, 
+                employment information, and personal details from the employee profile page.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
