@@ -49,42 +49,21 @@ export function LoginForm({
   };
 
   // Find employee record associated with the logged-in user
-  const findEmployeeRecord = async () => {
+  const findEmployeeRecord = async (authUserId: string) => {
     const supabase = createClient();
     
     try {
-      // Strategy 1: Find employee by email (check both company and personal email)
-      // First, get contact info that matches the user's email
-      const { data: contactInfo, error: contactError } = await supabase
-        .from('contact_info')
-        .select(`
-          employee_id,
-          employees!inner(
-            employee_id,
-            full_name_english,
-            employment_status
-          )
-        `)
-        .or(`company_email.eq.${formData.email},personal_email.eq.${formData.email}`)
-        .eq('employees.employment_status', 'Active')
-        .limit(1);
-
-      if (!contactError && contactInfo && contactInfo.length > 0) {
-        return contactInfo[0].employees[0].employee_id;
-      }
-
-      // Strategy 2: If no contact info found, get the most recent active employee
-      // This is a fallback for demo purposes
-      const { data: employees, error: employeeError } = await supabase
+      // Find employee by auth user id
+      const { data: employee, error: contactError } = await supabase
         .from('employees')
-        .select('employee_id, full_name_english')
-        .eq('employment_status', 'Active')
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .select(`
+          employee_id
+        `)
+        .eq('auth_user_id', authUserId)
+        .maybeSingle();
 
-      if (!employeeError && employees && employees.length > 0) {
-        console.log('Using fallback employee:', employees[0].full_name_english);
-        return employees[0].employee_id;
+      if (!contactError && employee) {
+        return employee.employee_id;
       }
 
       return null;
@@ -128,7 +107,7 @@ export function LoginForm({
       console.log('User authenticated successfully:', authData.user.email);
 
       // Step 3: Find associated employee record
-      const employeeId = await findEmployeeRecord();
+      const employeeId = await findEmployeeRecord(authData.user.id);
 
       // Step 4: Redirect based on result
       if (employeeId) {
@@ -245,6 +224,15 @@ export function LoginForm({
                 Create account
               </Link>
             </div>
+
+            {/* Info Note */}
+            <div className="text-center">
+              <div className="text-xs text-gray-500 bg-gray-50 rounded-md p-3">
+                💡 <strong>How it works:</strong> After login, you&apos;ll be redirected to your employee profile 
+                if one exists for your email address. If no employee record is found, you&apos;ll see the employees list.
+              </div>
+            </div>
+
           </form>
         </CardContent>
       </Card>

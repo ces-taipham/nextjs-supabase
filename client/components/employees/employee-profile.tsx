@@ -1,26 +1,30 @@
 // components/employees/employee-profile.tsx
-'use client';
+"use client";
 
-import React from 'react';
-import { useEmployee } from '@/lib/services/employee-service';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarInitials } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  User, 
-  Phone, 
-  Mail, 
-  Building2, 
-  Briefcase, 
+import React from "react";
+import { useEmployee } from "@/lib/services/employee-service";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarInitials } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  User,
+  Phone,
+  Mail,
+  Building2,
+  Briefcase,
   DollarSign,
   Edit,
   Calendar,
-} from 'lucide-react';
-import { getStatusBadgeClasses, formatCurrency, formatDate } from '@/lib/database-constants';
-import Link from 'next/link';
+} from "lucide-react";
+import {
+  getStatusBadgeClasses,
+  formatCurrency,
+  formatDate,
+} from "@/lib/database-constants";
+import Link from "next/link";
 
 interface EmployeeProfileProps {
   employeeId: string;
@@ -62,13 +66,24 @@ export function EmployeeProfile({ employeeId }: EmployeeProfileProps) {
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold">{employee.full_name_english}</h1>
-                  <p className="text-lg text-muted-foreground">{employee.full_name_vietnamese}</p>
+                  <h1 className="text-2xl font-bold">
+                    {employee.full_name_english}
+                  </h1>
+                  <p className="text-lg text-muted-foreground">
+                    {employee.full_name_vietnamese}
+                  </p>
                   <div className="flex items-center gap-4 mt-2">
-                    <Badge className={getStatusBadgeClasses('employment', employee.employment_status)}>
+                    <Badge
+                      className={getStatusBadgeClasses(
+                        "employment",
+                        employee.employment_status
+                      )}
+                    >
                       {employee.employment_status}
                     </Badge>
-                    <span className="text-sm text-muted-foreground">ID: {employee.employee_id}</span>
+                    <span className="text-sm text-muted-foreground">
+                      ID: {employee.employee_id}
+                    </span>
                   </div>
                 </div>
                 <Button asChild>
@@ -78,28 +93,39 @@ export function EmployeeProfile({ employeeId }: EmployeeProfileProps) {
                   </Link>
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{employee.employment_info?.position_english || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{employee.department?.name || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {employee.employment_info?.onboarding_date 
-                      ? formatDate(employee.employment_info.onboarding_date)
-                      : 'N/A'
+                    {
+                      (employee.employment_info || [
+                        { position_english: "N/A" },
+                      ])[0].position_english
                     }
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {employee.department?.name || "N/A"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {employee.employment_info &&
+                    employee.employment_info.length > 0 &&
+                    employee.employment_info[0].onboarding_date
+                      ? formatDate(employee.employment_info[0].onboarding_date)
+                      : "N/A"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{employee.contact_info?.company_email || 'N/A'}</span>
+                  <span className="text-sm">
+                    {employee.contact_info?.company_email || "N/A"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -138,7 +164,7 @@ export function EmployeeProfile({ employeeId }: EmployeeProfileProps) {
 
 // Tab Components
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function PersonalInfoTab({ employee}: { employee: any }) {
+function PersonalInfoTab({ employee }: { employee: any }) {
   const personalInfo = employee.personal_info?.[0];
 
   return (
@@ -151,14 +177,36 @@ function PersonalInfoTab({ employee}: { employee: any }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem label="Date of Birth" value={personalInfo?.date_of_birth ? formatDate(personalInfo.date_of_birth) : 'N/A'} />
-          <InfoItem label="Gender" value={personalInfo?.gender || 'N/A'} />
-          <InfoItem label="Place of Birth" value={personalInfo?.place_of_birth || 'N/A'} />
-          <InfoItem label="Nationality" value={personalInfo?.nationality || 'N/A'} />
-          <InfoItem label="Identity Card" value={personalInfo?.identity_card_number || 'N/A'} />
-          <InfoItem label="Passport" value={personalInfo?.passport_number || 'N/A'} />
-          <InfoItem label="Tax Code" value={personalInfo?.tax_code || 'N/A'} />
-          <InfoItem label="Social Insurance" value={personalInfo?.social_insurance_number || 'N/A'} />
+          <InfoItem
+            label="Date of Birth"
+            value={
+              personalInfo?.date_of_birth
+                ? formatDate(personalInfo.date_of_birth)
+                : "N/A"
+            }
+          />
+          <InfoItem label="Gender" value={personalInfo?.gender || "N/A"} />
+          <InfoItem
+            label="Place of Birth"
+            value={personalInfo?.place_of_birth || "N/A"}
+          />
+          <InfoItem
+            label="Nationality"
+            value={personalInfo?.nationality || "N/A"}
+          />
+          <InfoItem
+            label="Identity Card"
+            value={personalInfo?.identity_card_number || "N/A"}
+          />
+          <InfoItem
+            label="Passport"
+            value={personalInfo?.passport_number || "N/A"}
+          />
+          <InfoItem label="Tax Code" value={personalInfo?.tax_code || "N/A"} />
+          <InfoItem
+            label="Social Insurance"
+            value={personalInfo?.social_insurance_number || "N/A"}
+          />
         </div>
       </CardContent>
     </Card>
@@ -179,11 +227,26 @@ function ContactInfoTab({ employee }: { employee: any }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem label="Mobile Phone" value={contactInfo?.mobile_phone || 'N/A'} />
-          <InfoItem label="Company Email" value={contactInfo?.company_email || 'N/A'} />
-          <InfoItem label="Personal Email" value={contactInfo?.personal_email || 'N/A'} />
-          <InfoItem label="Permanent Address" value={contactInfo?.permanent_address || 'N/A'} />
-          <InfoItem label="Temporary Address" value={contactInfo?.temporary_address || 'N/A'} />
+          <InfoItem
+            label="Mobile Phone"
+            value={contactInfo?.mobile_phone || "N/A"}
+          />
+          <InfoItem
+            label="Company Email"
+            value={contactInfo?.company_email || "N/A"}
+          />
+          <InfoItem
+            label="Personal Email"
+            value={contactInfo?.personal_email || "N/A"}
+          />
+          <InfoItem
+            label="Permanent Address"
+            value={contactInfo?.permanent_address || "N/A"}
+          />
+          <InfoItem
+            label="Temporary Address"
+            value={contactInfo?.temporary_address || "N/A"}
+          />
         </div>
       </CardContent>
     </Card>
@@ -204,14 +267,39 @@ function EmploymentInfoTab({ employee }: { employee: any }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem label="Position (English)" value={employmentInfo?.position_english || 'N/A'} />
-          <InfoItem label="Position (Vietnamese)" value={employmentInfo?.position_vietnamese || 'N/A'} />
-          <InfoItem label="Department" value={employee.department?.departments?.name || 'N/A'} />
-          <InfoItem label="Manager" value={employee.manager?.manager?.full_name_english || 'N/A'} />
-          <InfoItem label="Grade" value={employmentInfo?.grade || 'N/A'} />
-          <InfoItem label="Working Type" value={employmentInfo?.working_type || 'N/A'} />
-          <InfoItem label="Employee Status" value={employmentInfo?.employee_status || 'N/A'} />
-          <InfoItem label="Onboarding Date" value={employmentInfo?.onboarding_date ? formatDate(employmentInfo.onboarding_date) : 'N/A'} />
+          <InfoItem
+            label="Position (English)"
+            value={employmentInfo?.position_english || "N/A"}
+          />
+          <InfoItem
+            label="Position (Vietnamese)"
+            value={employmentInfo?.position_vietnamese || "N/A"}
+          />
+          <InfoItem
+            label="Department"
+            value={employee.department?.departments?.name || "N/A"}
+          />
+          <InfoItem
+            label="Manager"
+            value={employee.manager?.manager?.full_name_english || "N/A"}
+          />
+          <InfoItem label="Grade" value={employmentInfo?.grade || "N/A"} />
+          <InfoItem
+            label="Working Type"
+            value={employmentInfo?.working_type || "N/A"}
+          />
+          <InfoItem
+            label="Employee Status"
+            value={employmentInfo?.employee_status || "N/A"}
+          />
+          <InfoItem
+            label="Onboarding Date"
+            value={
+              employmentInfo?.onboarding_date
+                ? formatDate(employmentInfo.onboarding_date)
+                : "N/A"
+            }
+          />
         </div>
       </CardContent>
     </Card>
@@ -232,26 +320,51 @@ function FinancialInfoTab({ employee }: { employee: any }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem 
-            label="Basic Salary" 
-            value={financialInfo?.basic_salary ? formatCurrency(financialInfo.basic_salary) : 'N/A'} 
+          <InfoItem
+            label="Basic Salary"
+            value={
+              financialInfo?.basic_salary
+                ? formatCurrency(financialInfo.basic_salary)
+                : "N/A"
+            }
           />
-          <InfoItem 
-            label="Position Allowance" 
-            value={financialInfo?.position_allowance ? formatCurrency(financialInfo.position_allowance) : 'N/A'} 
+          <InfoItem
+            label="Position Allowance"
+            value={
+              financialInfo?.position_allowance
+                ? formatCurrency(financialInfo.position_allowance)
+                : "N/A"
+            }
           />
-          <InfoItem 
-            label="Meal Allowance" 
-            value={financialInfo?.meal_allowance ? formatCurrency(financialInfo.meal_allowance) : 'N/A'} 
+          <InfoItem
+            label="Meal Allowance"
+            value={
+              financialInfo?.meal_allowance
+                ? formatCurrency(financialInfo.meal_allowance)
+                : "N/A"
+            }
           />
-          <InfoItem 
-            label="Travel Allowance" 
-            value={financialInfo?.travel_allowance ? formatCurrency(financialInfo.travel_allowance) : 'N/A'} 
+          <InfoItem
+            label="Travel Allowance"
+            value={
+              financialInfo?.travel_allowance
+                ? formatCurrency(financialInfo.travel_allowance)
+                : "N/A"
+            }
           />
-          <InfoItem label="Bank Name" value={financialInfo?.bank_name || 'N/A'} />
-          <InfoItem label="Bank Account" value={financialInfo?.bank_account_number || 'N/A'} />
-          <InfoItem label="Account Holder" value={financialInfo?.bank_account_holder || 'N/A'} />
-          <InfoItem label="Currency" value={financialInfo?.currency || 'VND'} />
+          <InfoItem
+            label="Bank Name"
+            value={financialInfo?.bank_name || "N/A"}
+          />
+          <InfoItem
+            label="Bank Account"
+            value={financialInfo?.bank_account_number || "N/A"}
+          />
+          <InfoItem
+            label="Account Holder"
+            value={financialInfo?.bank_account_holder || "N/A"}
+          />
+          <InfoItem label="Currency" value={financialInfo?.currency || "VND"} />
         </div>
       </CardContent>
     </Card>
@@ -262,7 +375,9 @@ function FinancialInfoTab({ employee }: { employee: any }) {
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <label className="text-sm font-medium text-muted-foreground">{label}</label>
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+      </label>
       <p className="text-sm mt-1">{value}</p>
     </div>
   );
@@ -287,7 +402,7 @@ function EmployeeProfileSkeleton() {
           </div>
         </CardContent>
       </Card>
-      
+
       <div className="space-y-4">
         <Skeleton className="h-10 w-full" />
         <Card>

@@ -2,17 +2,50 @@
 
 // ENUMS & CONSTANTS
 
-export type EmploymentStatus = 'Active' | 'Terminated' | 'Pre-onboarding' | 'Onboarding';
-export type MaritalStatus = 'Single' | 'Married' | 'Divorced' | 'Widowed';
-export type Gender = 'Male' | 'Female' | 'Other';
-export type ContactType = 'spouse' | 'child' | 'emergency_contact' | 'parent' | 'sibling' | 'other_family';
-export type EmployeeStatus = 'Normal' | 'On Leave' | 'Suspended' | 'Notice Period';
-export type WorkingType = 'Full-time' | 'Part-time' | 'Contract' | 'Intern';
-export type ContractType = 'Permanent' | 'Fixed-term' | 'Probation' | 'Intern' | 'Freelance';
-export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled' | 'taken';
-export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'delegated' | 'skipped';
-export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
-export type SkillType = 'Technical' | 'Soft Skills' | 'Languages' | 'Certification';
+export type EmploymentStatus =
+  | "Active"
+  | "Terminated"
+  | "Pre-onboarding"
+  | "Onboarding";
+export type MaritalStatus = "Single" | "Married" | "Divorced" | "Widowed";
+export type Gender = "Male" | "Female" | "Other";
+export type ContactType =
+  | "spouse"
+  | "child"
+  | "emergency_contact"
+  | "parent"
+  | "sibling"
+  | "other_family";
+export type EmployeeStatus =
+  | "Normal"
+  | "On Leave"
+  | "Suspended"
+  | "Notice Period";
+export type WorkingType = "Full-time" | "Part-time" | "Contract" | "Intern";
+export type ContractType =
+  | "Permanent"
+  | "Fixed-term"
+  | "Probation"
+  | "Intern"
+  | "Freelance";
+export type LeaveRequestStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled"
+  | "taken";
+export type ApprovalStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "delegated"
+  | "skipped";
+export type AuditAction = "INSERT" | "UPDATE" | "DELETE";
+export type SkillType =
+  | "Technical"
+  | "Soft Skills"
+  | "Languages"
+  | "Certification";
 
 // CORE ENTITIES
 
@@ -308,7 +341,7 @@ export interface AuditLog {
 export interface EmployeeWithDetails extends Employee {
   personal_info?: PersonalInfo;
   contact_info?: ContactInfo;
-    employment_info?: (EmploymentInfo & {
+  employment_info?: (EmploymentInfo & {
     departments?: Department;
     manager?: Employee;
   })[];
@@ -395,15 +428,32 @@ export interface PaginatedResponse<T> {
 
 // FORM TYPES
 
-export type CreateEmployeeRequest = Omit<Employee, 'employee_id' | 'number' | 'created_at' | 'updated_at'>;
-export type UpdateEmployeeRequest = Partial<Omit<Employee, 'employee_id' | 'number' | 'created_at' | 'updated_at'>>;
+export type CreateEmployeeRequest = Omit<
+  Employee,
+  "employee_id" | "number" | "created_at" | "updated_at"
+>;
+export type UpdateEmployeeRequest = Partial<
+  Omit<Employee, "employee_id" | "number" | "created_at" | "updated_at">
+>;
 
-export type CreateLeaveRequestRequest = Omit<LeaveRequest, 'id' | 'status' | 'approved_by' | 'approved_at' | 'created_at' | 'updated_at'>;
-export type UpdateLeaveRequestRequest = Partial<Omit<LeaveRequest, 'id' | 'employee_id' | 'created_by' | 'created_at' | 'updated_at'>>;
+export type CreateLeaveRequestRequest = Omit<
+  LeaveRequest,
+  "id" | "status" | "approved_by" | "approved_at" | "created_at" | "updated_at"
+>;
+export type UpdateLeaveRequestRequest = Partial<
+  Omit<
+    LeaveRequest,
+    "id" | "employee_id" | "created_by" | "created_at" | "updated_at"
+  >
+>;
 
-export type CreateDepartmentRequest = Omit<Department, 'id' | 'created_at' | 'updated_at'>;
-export type UpdateDepartmentRequest = Partial<Omit<Department, 'id' | 'created_at' | 'updated_at'>>;
-
+export type CreateDepartmentRequest = Omit<
+  Department,
+  "id" | "created_at" | "updated_at"
+>;
+export type UpdateDepartmentRequest = Partial<
+  Omit<Department, "id" | "created_at" | "updated_at">
+>;
 
 // QUERY TYPES
 
@@ -414,7 +464,7 @@ export interface EmployeeQuery {
   page?: number;
   page_size?: number;
   sort_by?: keyof Employee;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface LeaveRequestQuery {
@@ -435,28 +485,28 @@ export interface DepartmentQuery {
 
 // UTILITY TYPES
 
-export type TableNames = 
-  | 'employees'
-  | 'departments'
-  | 'personal_info'
-  | 'contact_info'
-  | 'employment_info'
-  | 'financial_info'
-  | 'contracts'
-  | 'employee_contacts'
-  | 'skills'
-  | 'employee_skills'
-  | 'leave_types'
-  | 'leave_requests'
-  | 'leave_approvals'
-  | 'leave_balances'
-  | 'leave_documents'
-  | 'leave_policies'
-  | 'approval_workflows'
-  | 'approval_workflow_steps'
-  | 'audit_logs';
+export type TableNames =
+  | "employees"
+  | "departments"
+  | "personal_info"
+  | "contact_info"
+  | "employment_info"
+  | "financial_info"
+  | "contracts"
+  | "employee_contacts"
+  | "skills"
+  | "employee_skills"
+  | "leave_types"
+  | "leave_requests"
+  | "leave_approvals"
+  | "leave_balances"
+  | "leave_documents"
+  | "leave_policies"
+  | "approval_workflows"
+  | "approval_workflow_steps"
+  | "audit_logs";
 
-export type DatabaseRow = 
+export type DatabaseRow =
   | Employee
   | Department
   | PersonalInfo

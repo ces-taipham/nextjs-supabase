@@ -1,62 +1,90 @@
 // components/employees/employee-list.tsx
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useEmployees } from '@/lib/services/employee-service';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarInitials } from '@/components/ui/avatar';
-import { 
-  Search, 
-  Plus, 
+import React, { useState } from "react";
+import { useEmployees } from "@/lib/services/employee-service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarInitials } from "@/components/ui/avatar";
+import {
+  Search,
+  Plus,
   MoreHorizontal,
   User,
   Building2,
   Eye,
   Edit,
-  Trash2
-} from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { getStatusBadgeClasses, EMPLOYMENT_STATUS_OPTIONS } from '@/lib/database-constants';
-import type { EmployeeQuery, EmploymentStatus } from '@/lib/supabase-types';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  getStatusBadgeClasses,
+  EMPLOYMENT_STATUS_OPTIONS,
+  formatDate,
+} from "@/lib/database-constants";
+import type { EmployeeQuery, EmploymentStatus } from "@/lib/supabase-types";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface EmployeeListProps {
   departmentId?: number;
   showCreateButton?: boolean;
 }
 
-export function EmployeeList({ departmentId, showCreateButton = true }: EmployeeListProps) {
+export function EmployeeList({
+  departmentId,
+  showCreateButton = true,
+}: EmployeeListProps) {
   const router = useRouter();
   const [query, setQuery] = useState<EmployeeQuery>({
     page: 0,
     page_size: 20,
-    employment_status: 'Active',
+    employment_status: "Active",
     department_id: departmentId,
   });
 
   const { data, isLoading, error } = useEmployees(query);
 
   const handleSearch = (search: string) => {
-    setQuery(prev => ({ ...prev, search: search || undefined, page: 0 }));
+    setQuery((prev) => ({ ...prev, search: search || undefined, page: 0 }));
   };
 
   const handleStatusFilter = (employment_status: string) => {
-    setQuery(prev => ({ 
-      ...prev, 
-      employment_status: employment_status === 'all' ? undefined : employment_status as EmploymentStatus,
-      page: 0 
+    setQuery((prev) => ({
+      ...prev,
+      employment_status:
+        employment_status === "all"
+          ? undefined
+          : (employment_status as EmploymentStatus),
+      page: 0,
     }));
   };
 
   const handlePageChange = (page: number) => {
-    setQuery(prev => ({ ...prev, page }));
+    setQuery((prev) => ({ ...prev, page }));
   };
 
   if (error) {
@@ -83,7 +111,7 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
           </p>
         </div>
         {showCreateButton && (
-          <Button onClick={() => router.push('/employees/new')}>
+          <Button onClick={() => router.push("/employees/new")}>
             <Plus className="mr-2 h-4 w-4" />
             Add Employee
           </Button>
@@ -108,7 +136,7 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
               </div>
             </div>
             <Select
-              value={query.employment_status || 'all'}
+              value={query.employment_status || "all"}
               onValueChange={handleStatusFilter}
             >
               <SelectTrigger className="w-[180px]">
@@ -116,7 +144,7 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                {EMPLOYMENT_STATUS_OPTIONS.map(option => (
+                {EMPLOYMENT_STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -155,11 +183,21 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-[60px] rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-8 rounded ml-auto" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-[100px]" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-[80px]" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-[60px] rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-[80px]" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-8 w-8 rounded ml-auto" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : data?.data.length === 0 ? (
@@ -167,12 +205,13 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
                   <TableCell colSpan={6} className="text-center py-8">
                     <div className="flex flex-col items-center gap-2">
                       <User className="h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">No employees found</p>
+                      <p className="text-sm text-muted-foreground">
+                        No employees found
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-
                 data?.data.map((employee) => (
                   <TableRow key={employee.employee_id}>
                     <TableCell>
@@ -183,7 +222,9 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{employee.full_name_english}</div>
+                          <div className="font-medium">
+                            {employee.full_name_english}
+                          </div>
                           <div className="text-sm text-muted-foreground">
                             {employee.full_name_vietnamese}
                           </div>
@@ -196,29 +237,45 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
                     <TableCell>
                       <div>
                         <div className="font-medium">
-                          {employee.employment_info?.position_english || 'N/A'}
+                          {
+                            (employee.employment_info || [
+                              { position_english: "N/A" },
+                            ])[0].position_english
+                          }
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {employee.employment_info?.position_vietnamese}
+                          {
+                            (employee.employment_info || [
+                              { position_vietnamese: "N/A" },
+                            ])[0].position_vietnamese
+                          }
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span>{employee.department?.name || 'N/A'}</span>
+                        <span>{employee.department?.name || "N/A"}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusBadgeClasses('employment', employee.employment_status)}>
+                      <Badge
+                        className={getStatusBadgeClasses(
+                          "employment",
+                          employee.employment_status
+                        )}
+                      >
                         {employee.employment_status}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {employee.employment_info?.onboarding_date 
-                        ? new Date(employee.employment_info.onboarding_date).toLocaleDateString()
-                        : 'N/A'
-                      }
+                      {employee.employment_info &&
+                      employee.employment_info.length > 0 &&
+                      employee.employment_info[0].onboarding_date
+                        ? formatDate(
+                            employee.employment_info[0].onboarding_date
+                          )
+                        : "N/A"}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -235,7 +292,9 @@ export function EmployeeList({ departmentId, showCreateButton = true }: Employee
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href={`/employees/${employee.employee_id}/edit`}>
+                            <Link
+                              href={`/employees/${employee.employee_id}/edit`}
+                            >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </Link>

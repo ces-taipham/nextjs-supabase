@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 export function SignUpForm({
   className,
@@ -63,7 +64,7 @@ export function SignUpForm({
   };
 
   // Create employee record in database
-  const createEmployeeRecord = async (employeeId: string) => {
+  const createEmployeeRecord = async (employeeId: string, authUser: User) => {
     const supabase = createClient();
     
     const employeeData = {
@@ -72,6 +73,7 @@ export function SignUpForm({
       full_name_vietnamese: formData.fullNameVietnamese.trim(),
       employment_status: 'Active' as const,
       marital_status: 'Single' as const,
+      auth_user_id: authUser?.id,
     };
 
     const { data, error } = await supabase
@@ -127,8 +129,17 @@ export function SignUpForm({
       // Step 3: Create employee record
       try {
         const employeeId = generateEmployeeId();
-        await createEmployeeRecord(employeeId);
-        console.log('Employee record created successfully with ID:', employeeId);
+        await createEmployeeRecord(employeeId, authData.user);
+        
+        // Step 4: Create contact info to link user email with employee
+        const supabase = createClient();
+        await supabase.from('contact_info').insert([{
+          employee_id: employeeId,
+          company_email: formData.email.trim(),
+          personal_email: formData.email.trim(),
+        }]);
+        
+        console.log('Employee record and contact info created successfully with ID:', employeeId);
       } catch (employeeError) {
         // Log the error but don't fail the signup process
         console.error('Employee record creation failed:', employeeError);
