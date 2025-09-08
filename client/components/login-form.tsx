@@ -224,15 +224,6 @@ export function LoginForm({
                 Create account
               </Link>
             </div>
-
-            {/* Info Note */}
-            <div className="text-center">
-              <div className="text-xs text-gray-500 bg-gray-50 rounded-md p-3">
-                💡 <strong>How it works:</strong> After login, you&apos;ll be redirected to your employee profile 
-                if one exists for your email address. If no employee record is found, you&apos;ll see the employees list.
-              </div>
-            </div>
-
           </form>
         </CardContent>
       </Card>

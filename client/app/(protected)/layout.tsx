@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { useState } from 'react';
+import { Header } from '@/components/header';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
+        <Header/>
         {children}
       </div>
       <Toaster position="top-right" />
